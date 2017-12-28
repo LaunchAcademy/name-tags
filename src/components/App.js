@@ -5,15 +5,47 @@ import QuoteDisplay from './QuoteDisplay'
 class App extends Component {
   constructor(props) {
     super(props)
+    this.state = {
+      quoteText: null,
+      quoteAuthor: null
+    }
+    this.handleNewQuoteClick = this.handleNewQuoteClick.bind(this)
+  }
+
+  handleNewQuoteClick(event) {
+    event.preventDefault()
+    this.fetchNewRandomQuote()
+  }
+  
+  fetchNewRandomQuote(){
+    fetch('/random_quote').then((resp) => {
+      if(resp.ok){
+        return resp.json()
+      }
+      else {
+        throw('Something went wrong')
+      }
+    }).then((json) => {
+      this.setState({
+        quoteText: json.quoteText,
+        quoteAuthor: json.quoteAuthor
+      })
+    })
+  }
+
+  componentDidMount(){
+    this.fetchNewRandomQuote()
   }
 
   render() {
-    const quoteAuthor = "Abraham Lincoln"
-    const quoteText = "A house divided against itself cannot stand."
-
     return (
       <div>
-        <QuoteDisplay quoteAuthor={quoteAuthor} quoteText={quoteText} />
+        <QuoteDisplay quoteAuthor={this.state.quoteAuthor} quoteText={this.state.quoteText} />
+        <div className="row">
+          <div className="column large-6 large-offset-3">
+            <button onClick={this.handleNewQuoteClick} className="btn">Moar Inspiration Please!</button>
+          </div>
+        </div>
       </div>
     )
   }
