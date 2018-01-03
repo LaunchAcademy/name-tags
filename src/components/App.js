@@ -18,6 +18,8 @@ class App extends Component {
     this.handleLastNameChange = this.handleLastNameChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.clearErrors = this.clearErrors.bind(this)
+    this.validateFirstName = this.validateFirstName.bind(this)
+    this.validateLastName = this.validateLastName.bind(this)
   }
 
   handleFirstNameChange(event) {
@@ -30,30 +32,36 @@ class App extends Component {
 
   setFormDetail(key, value) {
     let oldState = this.state.form
-    oldState[key] = value
+    let newState = Object.assign({}, oldState)
+    newState[key] = value
     this.setState({
-      form: oldState
+      form: newState
     })
   }
 
   handleSubmit(event){
     event.preventDefault()
     this.clearErrors()
-    this.validateFirstName()
-    this.validateLastName()
 
-    const newGuests = this.state.guests.concat([{
-      firstName: this.state.form.firstName,
-      lastName: this.state.form.lastName
-    }])
+    let errors = this.validateFirstName()
+    errors = errors.concat(this.validateLastName())
 
-    if(this.state.errors.length === 0) {
+    if(errors.length == 0) {
+      const newGuests = this.state.guests.concat([{
+        firstName: this.state.form.firstName,
+        lastName: this.state.form.lastName
+      }])
       this.setState({
         guests: newGuests,
         form: {
           firstName: '',
           lastName: ''
         }
+      })
+    }
+    else {
+      this.setState({
+        errors: errors
       })
     }
   }
@@ -66,17 +74,19 @@ class App extends Component {
 
   validateFirstName(){
     if(this.state.form.firstName === '') {
-      this.setState({
-        errors: this.state.errors.concat(["First Name can't be blank"])
-      })
+      return ["First Name can't be blank"]
+    }
+    else {
+      return []
     }
   }
 
   validateLastName(){
     if(this.state.form.lastName === '') {
-      this.setState({
-        errors: this.state.errors.concat(["Last Name can't be blank"])
-      })
+      return ["Last Name can't be blank"]
+    }
+    else {
+      return []
     }
   }
 
